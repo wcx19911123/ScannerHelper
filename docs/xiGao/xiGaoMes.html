@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="https://unpkg.com/vue@2/dist/vue.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div id="xiGaoMes" v-cloak>
+    <el-row>
+        <el-col :xs="{span:12,offset:6}" :sm="{span:10,offset:7}" :md="{span:8,offset:8}" :lg="{span:7,offset:8}"
+                :xl="{span:6,offset:9}">
+            <el-form ref="form" :model="form" label-position="left" label-width="auto">
+                <el-form-item label="操作类型">
+                    <el-input v-model="typeName" clearable :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="操作员">
+                    <el-input v-model="form.name" clearable></el-input>
+                </el-form-item>
+                <el-form-item label="入库单号">
+                    <el-input v-model="form.orderNo" clearable></el-input>
+                </el-form-item>
+                <el-form-item label="产品名称">
+                    <el-input v-model="form.productNo" clearable></el-input>
+                </el-form-item>
+                <el-form-item label="数量">
+                    <el-input v-model="form.number" clearable type="number"></el-input>
+                </el-form-item>
+                <el-form-item label="备注">
+                    <el-input v-model="form.remark" clearable type="textarea"></el-input>
+                </el-form-item>
+                <el-form-item label="入库条码">
+                    <el-input v-model="form.QRCode" clearable></el-input>
+                </el-form-item>
+            </el-form>
+        </el-col>
+    </el-row>
+</div>
+<script>
+    var vue = new Vue({
+        el: '#xiGaoMes',
+        data: function () {
+            return {
+                form: {
+                    name: '',
+                    type: '' + new URLSearchParams(location.search).get('type'),
+                    orderNo: '',
+                    productNo: '',
+                    number: '',
+                    remark: '',
+                    QRCode: '',
+                },
+            }
+        },
+        computed: {
+            typeName: function () {
+                return this.form.type === 'in' ? '入库' : '出库';
+            },
+        },
+        mounted: function () {
+        },
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>博士达工具箱</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="https://unpkg.com/vue@2/dist/vue.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+
+        #app {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #app .el-aside {
+            height: 90vh;
+        }
+    </style>
+</head>
+<body>
+<div id="app" v-cloak>
+    <el-container>
+        <el-header style="height:10vh;background-color:#c6e2ff;min-height:96px;">
+            <el-row type="flex" align="center" style="margin:0 auto;">
+                <el-col :xs="8" :sm="6" :md="4" :lg="3" :xl="2">
+                    <object data="logo.svg" type="image/svg+xml"
+                            style="width:100%;max-height:10vh;min-height:96px;"></object>
+                </el-col>
+                <el-col :xs="{span:12,offset:2}" :sm="{span:10,offset:4}" :md="{span:8,offset:6}"
+                        :lg="{span:7,offset:7}" :xl="{span:6,offset:8}">
+                    <h1 style="font-size:32px;">博士达工具箱</h1>
+                </el-col>
+            </el-row>
+        </el-header>
+        <el-container>
+            <el-aside width="collapse">
+                <el-menu background-color="#545c64" text-color="#fff" active-text-color="#ffd04b" style="height:90vh;"
+                         :collapse="isCollapse" @select="selectMenu">
+                    <el-menu-item index="collapse" @click="hideMenu">
+                        <i :class="collapseClass"></i>
+                        <span slot="title">{{collapseTitle}}</span>
+                    </el-menu-item>
+                    <el-submenu index="xiGao">
+                        <template slot="title">
+                            <i class="el-icon-aim"></i>
+                            <span>锡膏房扫描</span>
+                        </template>
+                        <el-menu-item-group>
+                            <template slot="title">锡膏出入库扫描</template>
+                            <el-menu-item index="xiGao-in">入库</el-menu-item>
+                            <el-menu-item index="xiGao-out">出库</el-menu-item>
+                        </el-menu-item-group>
+                    </el-submenu>
+                </el-menu>
+            </el-aside>
+            <el-main>
+                <iframe :src="mainUrl" frameborder="0" width="100%" height="99%"></iframe>
+            </el-main>
+        </el-container>
+    </el-container>
+</div>
+</body>
+<script>
+    new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                isCollapse: false,
+                mainContent: '',
+                menu: {
+                    'xiGao-in': {page: '/xiGao/xiGaoMes.html', params: {type: 'in'}},
+                    'xiGao-out': {page: '/xiGao/xiGaoMes.html', params: {type: 'out'}},
+                },
+                mainParams: '',
+                mainUrl: '',
+            }
+        },
+        computed: {
+            collapseClass: function () {
+                return this.isCollapse ? 'el-icon-d-arrow-right' : 'el-icon-d-arrow-left';
+            },
+            collapseTitle: function () {
+                return this.isCollapse ? '展开菜单' : '收起菜单';
+            },
+        },
+        methods: {
+            hideMenu: function () {
+                this.isCollapse = !this.isCollapse;
+            },
+            selectMenu: function (index) {
+                if (!this.menu[index]) {
+                    return;
+                }
+                let page = this.menu[index].page;
+                let params = this.menu[index].params;
+                params = params ? new URLSearchParams(params).toString() : '';
+                page = params ? page + '?' + params : '';
+                this.mainUrl = page;
+            },
+        },
+    })
+</script>
+</html>
