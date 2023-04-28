@@ -72,7 +72,7 @@
                     next = next.querySelector('input') || next.querySelector('textarea');
                     next?.focus();
                 }
-                if (name === '入库条码') {
+                if (name === '入库条码' && obj.value?.length > 1) {
                     alert(obj.value);
                 }
             },
