@@ -56,6 +56,7 @@
                     remark: '',
                     QRCode: '',
                 },
+                gap: 100,
             }
         },
         computed: {
@@ -72,8 +73,21 @@
                     next = next.querySelector('input') || next.querySelector('textarea');
                     next?.focus();
                 }
-                if (name === '入库条码' && obj.value?.length > 1) {
-                    alert(obj.value);
+                if (name === '入库条码') {
+                    let previous = null;
+                    let times = 0;
+                    let eventId = setInterval(function () {
+                        let now = obj.value;
+                        if (previous !== now) {
+                            previous = now;
+                            times = 0;
+                        } else if (times < 1) {
+                            times++
+                        } else {
+                            clearInterval(eventId);
+                            alert(obj.value);
+                        }
+                    }, this.gap);
                 }
             },
         },
