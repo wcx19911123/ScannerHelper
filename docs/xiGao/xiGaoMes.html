@@ -57,6 +57,7 @@
                     QRCode: '',
                 },
                 gap: 100,
+                started: false,
             }
         },
         computed: {
@@ -76,8 +77,15 @@
                 if (name === '入库条码') {
                     let previous = null;
                     let times = 0;
+                    if (this.started) {
+                        return;
+                    }
+                    let _this = this;
                     let eventId = setInterval(function () {
                         let now = obj.value;
+                        if (!now) {
+                            return;
+                        }
                         if (previous !== now) {
                             previous = now;
                             times = 0;
@@ -85,6 +93,7 @@
                             times++
                         } else {
                             clearInterval(eventId);
+                            _this.started = false;
                             alert(obj.value);
                         }
                     }, this.gap);
