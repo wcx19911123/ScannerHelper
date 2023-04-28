@@ -74,8 +74,8 @@
                 isCollapse: false,
                 mainContent: '',
                 menu: {
-                    'xiGao-in': {page: '/xiGao/xiGaoMes.html', params: {type: 'in'}},
-                    'xiGao-out': {page: '/xiGao/xiGaoMes.html', params: {type: 'out'}},
+                    'xiGao-in': {page: 'xiGao/xiGaoMes.html', params: {type: 'in'}},
+                    'xiGao-out': {page: 'xiGao/xiGaoMes.html', params: {type: 'out'}},
                 },
                 mainParams: '',
                 mainUrl: '',
@@ -97,9 +97,9 @@
                 if (!this.menu[index]) {
                     return;
                 }
-                let url = location.href;
-                url = url.indexOf('github.io') > -1 ? 'ScannerHelper/' : '';
-                let page = url + this.menu[index].page;
+                // let url = location.href;
+                // url = url.indexOf('github.io') > -1 ? 'ScannerHelper/' : '';
+                let page = /*url + */this.menu[index].page;
                 let params = this.menu[index].params;
                 params = params ? new URLSearchParams(params).toString() : '';
                 page = params ? page + '?' + params : '';
