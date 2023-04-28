@@ -21,22 +21,22 @@
                     <el-input v-model="typeName" clearable :disabled="true"></el-input>
                 </el-form-item>
                 <el-form-item label="操作员">
-                    <el-input v-model="form.name" clearable></el-input>
+                    <el-input v-model="form.name" clearable @keyup.enter.native="keyEnter"></el-input>
                 </el-form-item>
                 <el-form-item label="入库单号">
-                    <el-input v-model="form.orderNo" clearable></el-input>
+                    <el-input v-model="form.orderNo" clearable @keyup.enter.native="keyEnter"></el-input>
                 </el-form-item>
                 <el-form-item label="产品名称">
-                    <el-input v-model="form.productNo" clearable></el-input>
+                    <el-input v-model="form.productNo" clearable @keyup.enter.native="keyEnter"></el-input>
                 </el-form-item>
                 <el-form-item label="数量">
-                    <el-input v-model="form.number" clearable type="number"></el-input>
+                    <el-input v-model="form.number" clearable type="number" @keyup.enter.native="keyEnter"></el-input>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input v-model="form.remark" clearable type="textarea"></el-input>
+                    <el-input v-model="form.remark" clearable type="textarea" @keyup.enter.native="keyEnter"></el-input>
                 </el-form-item>
                 <el-form-item label="入库条码">
-                    <el-input v-model="form.QRCode" clearable></el-input>
+                    <el-input v-model="form.QRCode" clearable @keyup.enter.native="keyEnter"></el-input>
                 </el-form-item>
             </el-form>
         </el-col>
@@ -61,6 +61,20 @@
         computed: {
             typeName: function () {
                 return this.form.type === 'in' ? '入库' : '出库';
+            },
+        },
+        methods: {
+            keyEnter: function (e) {
+                let obj = e.target;
+                let name = obj.parentNode.parentNode.previousSibling.firstChild.innerHTML;
+                if (['操作员', '入库单号', '产品名称', '数量'].includes(name)) {
+                    let next = obj.parentNode.parentNode.parentNode.nextElementSibling;
+                    next = next.querySelector('input') || next.querySelector('textarea');
+                    next?.focus();
+                }
+                if (name === '入库条码') {
+                    alert(obj.value);
+                }
             },
         },
         mounted: function () {
