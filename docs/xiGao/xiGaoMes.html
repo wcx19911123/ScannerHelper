@@ -16,29 +16,40 @@
     <el-row>
         <el-col :xs="{span:12,offset:6}" :sm="{span:10,offset:7}" :md="{span:8,offset:8}" :lg="{span:7,offset:8}"
                 :xl="{span:6,offset:9}">
-            <el-form ref="form" :model="form" label-position="left" label-width="auto">
+            <el-form ref="form" :model="form" label-position="left" label-width="auto" :rules="rules">
                 <el-form-item label="操作类型">
                     <el-input v-model="typeName" clearable :disabled="true"></el-input>
                 </el-form-item>
-                <el-form-item label="操作员">
-                    <el-input v-model="form.name" clearable @keyup.enter.native="keyEnter"></el-input>
+                <el-form-item label="操作员" prop="name">
+                    <el-input v-model="form.name" ref="name" clearable @keyup.enter.native="keyEnter"
+                              @blur="saveInput"></el-input>
                 </el-form-item>
-                <el-form-item label="入库单号">
-                    <el-input v-model="form.orderNo" clearable @keyup.enter.native="keyEnter"></el-input>
+                <el-form-item label="入库单号" prop="orderNo">
+                    <el-input v-model="form.orderNo" ref="orderNo" clearable @keyup.enter.native="keyEnter"
+                              @blur="saveInput"></el-input>
                 </el-form-item>
-                <el-form-item label="产品名称">
-                    <el-input v-model="form.productNo" clearable @keyup.enter.native="keyEnter"></el-input>
+                <el-form-item label="产品编号" prop="productNo">
+                    <el-input v-model="form.productNo" ref="productNo" clearable @keyup.enter.native="keyEnter"
+                              @blur="saveInput"></el-input>
                 </el-form-item>
-                <el-form-item label="数量">
-                    <el-input v-model="form.number" clearable type="number" @keyup.enter.native="keyEnter"></el-input>
+                <el-form-item label="数量" prop="number">
+                    <el-input v-model="form.number" ref="number" clearable type="number" @keyup.enter.native="keyEnter"
+                              @blur="saveInput"></el-input>
                 </el-form-item>
-                <el-form-item label="备注">
-                    <el-input v-model="form.remark" clearable type="textarea" @keyup.enter.native="keyEnter"></el-input>
+                <el-form-item label="备注" prop="remark">
+                    <el-input v-model="form.remark" ref="remark" clearable type="textarea" @blur="saveInput"
+                              @keyup.enter.native="keyEnter"></el-input>
                 </el-form-item>
-                <el-form-item label="入库条码">
-                    <el-input v-model="form.QRCode" clearable @keyup.enter.native="keyEnter"></el-input>
+                <el-form-item label="入库条码" prop="qrCode">
+                    <el-input v-model="form.qrCode" ref="qrCode" clearable @keyup.enter.native="keyEnter"
+                              placeholder="请点击这里后使用扫码枪"></el-input>
                 </el-form-item>
             </el-form>
+            <div v-show="done > 0 && total > 0">
+                <el-statistic title="已完成">
+                    <template slot="formatter">{{done}} / {{total}}</template>
+                </el-statistic>
+            </div>
         </el-col>
     </el-row>
 </div>
@@ -47,6 +58,7 @@
         el: '#xiGaoMes',
         data: function () {
             return {
+                prefix: '__ScannerHelper_',
                 form: {
                     name: '',
                     type: '' + new URLSearchParams(location.search).get('type'),
@@ -54,10 +66,20 @@
                     productNo: '',
                     number: '',
                     remark: '',
-                    QRCode: '',
+                    qrCode: '',
                 },
                 gap: 100,
                 started: false,
+                now: 0,
+                done: 0,
+                total: 0,
+                rules: {
+                    name: [{required: true, message: '请输入操作员', trigger: 'blur'}],
+                    orderNo: [{required: true, message: '请输入入库单号', trigger: 'blur'}],
+                    productNo: [{required: true, message: '请输入产品编号', trigger: 'blur'}],
+                    number: [{required: true, message: '请输入数量', trigger: 'blur'}],
+                    remark: [],
+                },
             }
         },
         computed: {
@@ -69,7 +91,7 @@
             keyEnter: function (e) {
                 let obj = e.target;
                 let name = obj.parentNode.parentNode.previousSibling.firstChild.innerHTML;
-                if (['操作员', '入库单号', '产品名称', '数量'].includes(name)) {
+                if (['操作员', '入库单号', '产品编号', '数量'].includes(name)) {
                     let next = obj.parentNode.parentNode.parentNode.nextElementSibling;
                     next = next.querySelector('input') || next.querySelector('textarea');
                     next?.focus();
@@ -81,6 +103,7 @@
                         return;
                     }
                     this.started = true;
+                    this.now = new Date().getTime();
                     let _this = this;
                     let eventId = setInterval(function () {
                         let now = obj.value;
@@ -95,13 +118,88 @@
                         } else {
                             clearInterval(eventId);
                             _this.started = false;
-                            alert(obj.value);
+                            _this.$refs['form'].validate((valid, list) => {
+                                if (valid) {
+                                    let post = {
+                                        "operator": _this.form.name,
+                                        "orderNo": _this.form.orderNo,
+                                        "productNo": _this.form.productNo,
+                                        "number": _this.form.number,
+                                        "remark": _this.form.remark,
+                                        "type": {"in": "1", "out": "2"}[_this.form.type],
+                                        "qrCode": _this.form.qrCode
+                                    };
+                                    fetch('http://localhost:8080/in', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json;charset=utf-8'
+                                        },
+                                        body: JSON.stringify(post)
+                                    })
+                                        .then(o => o.json().then(o => {
+                                            if (o.code === 0) {
+                                                _this.$message({
+                                                    message: '操作成功',
+                                                    type: 'success',
+                                                    duration: 1000,
+                                                    offset: 160
+                                                });
+                                                _this.done = o.data.done;
+                                                _this.total = o.data.total;
+                                                _this.form.qrCode = '';
+                                                _this.$refs['qrCode'].focus();
+                                            } else {
+                                                _this.$message({
+                                                    message: '操作失败：' + o.msg,
+                                                    type: 'error',
+                                                    duration: 2000,
+                                                    offset: 160
+                                                });
+                                            }
+                                        }))
+                                        .catch(o => _this.$message({
+                                            message: '操作失败：系统错误，请联系管理员',
+                                            type: 'error',
+                                            duration: 3000,
+                                            offset: 160
+                                        }));
+                                } else {
+                                    for (let i in list) {
+                                        if (typeof i != 'string' || i.length <= 0) {
+                                            continue;
+                                        }
+                                        let obj = _this.$refs[i];
+                                        if (!obj) {
+                                            continue;
+                                        }
+                                        obj.focus();
+                                        break;
+                                    }
+                                    return false;
+                                }
+                            });
                         }
                     }, this.gap);
                 }
             },
+            saveInput: function () {
+                this.set('saveInput', JSON.stringify(this.form));
+            },
+            set: function (k, v) {
+                localStorage.setItem(this.prefix + k, v);
+            },
+            get: function (k) {
+                return localStorage.getItem(this.prefix + k);
+            },
         },
         mounted: function () {
+            let saved = this.get('saveInput');
+            if (saved) {
+                let obj = JSON.parse(saved);
+                delete obj['type'];
+                delete obj['qrCode'];
+                Object.assign(this.form, obj);
+            }
         },
     });
 </script>
