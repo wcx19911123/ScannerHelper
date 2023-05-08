@@ -70,7 +70,6 @@
                 },
                 gap: 100,
                 started: false,
-                //now: 0,
                 previous: null,
                 times: 0,
                 done: 0,
@@ -113,7 +112,6 @@
                         return;
                     }
                     this.started = true;
-                    //this.now = new Date().getTime();
                     let _this = this;
                     let eventId = setInterval(function () {
                         let now = obj.value;
@@ -158,7 +156,7 @@
                                                 });
                                                 _this.done = o.data.done;
                                                 _this.total = o.data.total;
-                                                // _this.form.qrCode = '';
+                                                _this.form.qrCode = '';
                                                 _this.$refs['qrCode'].focus();
                                             } else {
                                                 _this.$message({
