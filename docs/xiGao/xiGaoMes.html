@@ -70,7 +70,9 @@
                 },
                 gap: 100,
                 started: false,
-                now: 0,
+                //now: 0,
+                previous: null,
+                times: 0,
                 done: 0,
                 total: 0,
                 rules: {
@@ -97,27 +99,27 @@
                     next?.focus();
                 }
                 if (name === '入库条码') {
-                    let previous = null;
-                    let times = 0;
                     if (this.started) {
                         return;
                     }
                     this.started = true;
-                    this.now = new Date().getTime();
+                    //this.now = new Date().getTime();
                     let _this = this;
                     let eventId = setInterval(function () {
                         let now = obj.value;
-                        if (!now) {
+                        if (!now || !_this.started) {
                             return;
                         }
-                        if (previous !== now) {
-                            previous = now;
-                            times = 0;
-                        } else if (times < 1) {
-                            times++
+                        if (_this.previous !== now) {
+                            _this.previous = now;
+                            _this.times = 0;
+                        } else if (_this.times < 1) {
+                            _this.times++
                         } else {
                             clearInterval(eventId);
                             _this.started = false;
+                            _this.previous = null;
+                            _this.times = 0;
                             _this.$refs['form'].validate((valid, list) => {
                                 if (valid) {
                                     let post = {
@@ -146,7 +148,7 @@
                                                 });
                                                 _this.done = o.data.done;
                                                 _this.total = o.data.total;
-                                                _this.form.qrCode = '';
+                                                // _this.form.qrCode = '';
                                                 _this.$refs['qrCode'].focus();
                                             } else {
                                                 _this.$message({
