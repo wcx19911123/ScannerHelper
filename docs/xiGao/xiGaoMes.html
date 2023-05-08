@@ -99,6 +99,16 @@
                     next?.focus();
                 }
                 if (name === '入库条码') {
+                    let url = new URLSearchParams(window.location.href.split('?')?.['1'] || '').get('url');
+                    if (!url || url === 'null' || url === 'undefined') {
+                        this.$message({
+                            message: 'url没有配置databaseUrl',
+                            type: 'error',
+                            duration: 2000,
+                            offset: 160
+                        });
+                        return;
+                    }
                     if (this.started) {
                         return;
                     }
@@ -131,7 +141,7 @@
                                         "type": {"in": "1", "out": "2"}[_this.form.type],
                                         "qrCode": _this.form.qrCode
                                     };
-                                    fetch('http://localhost:8080/in', {
+                                    fetch(`http://${url}/in`, {
                                         method: 'POST',
                                         headers: {
                                             'Content-Type': 'application/json;charset=utf-8'

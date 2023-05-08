@@ -66,12 +66,13 @@
     new Vue({
         el: '#app',
         data: function () {
+            let databaseUrl = new URLSearchParams(window.location.href.split('?')?.['1'] || '').get('databaseUrl');
             return {
                 isCollapse: false,
                 mainContent: '',
                 menu: {
-                    'xiGao-in': {page: 'xiGao/xiGaoMes.html', params: {type: 'in'}},
-                    'xiGao-out': {page: 'xiGao/xiGaoMes.html', params: {type: 'out'}},
+                    'xiGao-in': {page: 'xiGao/xiGaoMes.html', params: {type: 'in', url: databaseUrl}},
+                    'xiGao-out': {page: 'xiGao/xiGaoMes.html', params: {type: 'out', url: databaseUrl}},
                 },
                 mainParams: '',
                 mainUrl: '',
